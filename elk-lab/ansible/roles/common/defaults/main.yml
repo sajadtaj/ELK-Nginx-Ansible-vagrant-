@@ -1,0 +1,17 @@
+# encoding: utf-8
+---
+common_locale: "en_US.UTF-8"
+common_timezone: "UTC"
+common_base_packages:
+  - curl
+  - wget
+  - vim
+  - net-tools
+  - htop
+  - gnupg
+  - apt-transport-https
+common_ntp_package: "chrony"
+common_upgrade: false
+common_set_locale: true
+common_install_ntp: false
+common_manage_firewall: false

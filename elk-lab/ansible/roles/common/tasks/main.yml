@@ -1,0 +1,90 @@
+# encoding: utf-8
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all packages (optional)
+  apt:
+    upgrade: dist
+    autoremove: yes
+  when: false  # موقتاً غیر فعال برای دورزدن باگ Jinja/Ansible
+
+- name: Ensure locales package is installed
+  apt:
+    name: locales
+    state: present
+  when: common_set_locale
+
+- name: Generate UTF-8 locale
+  command: locale-gen {{ common_locale }}
+  when: common_set_locale
+
+- name: Set system locale
+  lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: "LANG={{ common_locale }}"
+  when: common_set_locale
+
+- name: Install base packages
+  apt:
+    name: "{{ common_base_packages }}"
+    state: present
+
+- name: Set timezone
+  timezone:
+    name: "{{ common_timezone }}"
+
+- name: Install NTP package (optional)
+  apt:
+    name: "{{ common_ntp_package }}"
+    state: present
+  when: common_install_ntp
+
+- name: Ensure NTP service is enabled and running (optional)
+  service:
+    name: "{{ common_ntp_package }}"
+    state: started
+    enabled: yes
+  when: common_install_ntp
+
+- name: Install UFW (optional)
+  apt:
+    name: "{{ common_firewall_pkg }}"
+    state: present
+  when: common_manage_firewall
+
+- name: Allow SSH in UFW (optional)
+  ufw:
+    rule: allow
+    name: OpenSSH
+  when: common_manage_firewall
+
+- name: Enable UFW (optional)
+  ufw:
+    state: enabled
+    policy: deny
+  when: common_manage_firewall
+
+- name: Ensure en_US.UTF-8 is enabled in /etc/locale.gen
+  lineinfile:
+    path: /etc/locale.gen
+    regexp: '^#?en_US\.UTF-8 UTF-8'
+    line: 'en_US.UTF-8 UTF-8'
+
+- name: Regenerate locales (finalize)
+  command: locale-gen
+  changed_when: false
+
+- name: Persist LC_ALL/LANG/LANGUAGE
+  lineinfile:
+    path: /etc/environment
+    regexp: '^{{ item.key }}='
+    line: '{{ item.key }}="{{ item.value }}"'
+    create: yes
+  loop:
+    - { key: 'LANG',      value: '{{ common_locale }}' }
+    - { key: 'LC_ALL',    value: '{{ common_locale }}' }
+    - { key: 'LANGUAGE',  value: 'en_US:en' }

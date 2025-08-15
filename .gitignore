@@ -1,0 +1,76 @@
+# =============================
+# Python
+# =============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual Environment
+.env
+.venv/
+venv/
+ENV/
+
+# =============================
+# Ansible
+# =============================
+*.retry
+# فایل‌های حساس Ansible Vault
+*.vault
+*.vault_pass
+
+# =============================
+# Logs & Temporary Files
+# =============================
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+
+# =============================
+# OS Generated Files
+# =============================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# =============================
+# Docker
+# =============================
+# فایل‌های Build
+docker-compose.override.yml
+.docker/
+.dockerignore
+
+# =============================
+# Vagrant
+# =============================
+.vagrant/
+*.box
+
+# =============================
+# IDEs & Editors
+# =============================
+# VS Code
+.vscode/
+# PyCharm / IntelliJ
+.idea/
+*.iml
+
+# =============================
+# Local Data & Backups
+# =============================
+backup/
+tmp/
+cache/
