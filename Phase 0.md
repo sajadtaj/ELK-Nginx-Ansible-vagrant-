@@ -169,7 +169,7 @@ ping -c2 192.168.57.13
 ping -c2 192.168.57.14
 ```
 
-````
+
 
 ---
 
@@ -179,7 +179,7 @@ cd elk-lab
 vagrant up --no-provision
 vagrant ssh lb -c "cat /etc/os-release | grep PRETTY_NAME"
 vagrant ssh lb -c "ping -c2 192.168.57.11 && ping -c2 192.168.57.12 && ping -c2 192.168.57.13 && ping -c2 192.168.57.14"
-````
+```
 
 * اگر خطای Host-Only گرفتی:
 

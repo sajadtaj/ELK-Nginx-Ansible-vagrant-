@@ -1,0 +1,53 @@
+# encoding: utf-8
+---
+- name: Install Nginx (Debian)
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Ensure /etc/nginx/conf.d exists
+  file:
+    path: /etc/nginx/conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy main nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Deploy LB config (upstream + server)
+  template:
+    src: lb.conf.j2
+    dest: /etc/nginx/conf.d/lb.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Deploy custom error page (UTF-8)
+  template:
+    src: error_page.html.j2
+    dest: /usr/share/nginx/html/custom_50x.html
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Validate nginx configuration (nginx -t)
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+  failed_when: nginx_test.rc != 0
+
+- name: Ensure nginx enabled and running
+  service:
+    name: nginx
+    state: started
+    enabled: yes

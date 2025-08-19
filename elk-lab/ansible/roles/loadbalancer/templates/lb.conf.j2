@@ -1,0 +1,49 @@
+# encoding: utf-8
+{% if lb_method == 'ip_hash' %}
+upstream app_upstream {
+    ip_hash;
+{% elif lb_method == 'least_conn' %}
+upstream app_upstream {
+    least_conn;
+{% else %}
+upstream app_upstream {
+    # round_robin (default)
+{% endif %}
+{% for s in upstream_servers %}
+    server {{ s.host }}:{{ upstream_port }} max_fails=2 fail_timeout=3s;
+{% endfor %}
+}
+
+server {
+    listen {{ lb_listen_port }};
+    server_name _;
+
+    # health endpoint مستقل از upstream
+    location /healthz {
+        default_type text/plain;
+        return 200 "ok\n";
+        add_header Cache-Control "no-store";
+    }
+
+
+    # صفحهٔ خطای UTF-8
+    error_page 502 503 504 /custom_50x.html;
+    location = /custom_50x.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+
+    location / {
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout {{ proxy_connect_timeout }};
+        proxy_read_timeout    {{ proxy_read_timeout }};
+        proxy_send_timeout    {{ proxy_send_timeout }};
+        proxy_next_upstream   {{ proxy_next_upstream }};
+
+        proxy_pass http://app_upstream;
+    }
+}

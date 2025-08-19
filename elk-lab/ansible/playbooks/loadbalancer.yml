@@ -1,0 +1,7 @@
+# encoding: utf-8
+---
+- name: Configure Nginx Load Balancer
+  hosts: loadbalancers
+  become: yes
+  roles:
+    - loadbalancer

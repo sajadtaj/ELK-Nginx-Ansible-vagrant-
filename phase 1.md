@@ -262,6 +262,16 @@ ansible-playbook -i ansible/inventories/vagrant/hosts.ini ansible/playbooks/comm
 
 ### 6) تست و تأیید فاز ۱
 
+0. تست اتصال Ansible به نودها
+
+```bash
+# بررسی وضعیت با
+vagrant status
+
+#
+ansible -i ansible/inventories/vagrant/hosts.ini all -m ping
+```
+
 1. بررسی نصب بسته‌ها:
 
 ```bash
