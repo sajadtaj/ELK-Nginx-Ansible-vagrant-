@@ -1,0 +1,27 @@
+# encoding: utf-8
+
+# مسیر دیتادایر برای کلستر دیبیان
+data_directory   = '{{ pg_data_dir }}'
+# مینیمال/شفاف برای محیط آموزشی
+listen_addresses = '{{ db_listen_addresses }}'
+port             = {{ db_port }}
+
+# Memory
+shared_buffers   = '{{ db_shared_buffers }}'
+max_connections  = {{ db_max_connections }}
+
+# Locale/Encoding (ایجاد دیتابیس‌ها با UTF-8 انجام می‌شود)
+# server_encoding در هسته DB ثابت است؛ دیتابیس‌های جدید با UTF-8 ساخته می‌شوند.
+# client_encoding را در کلاینت/سشن ست می‌کنیم.
+
+# Logging
+logging_collector  = {{ db_logging_collector }}
+log_destination    = '{{ db_log_destination }}'
+log_directory      = '{{ db_log_directory }}'
+log_filename       = '{{ db_log_filename }}'
+log_rotation_age   = '{{ db_log_rotation_age }}'
+log_rotation_size  = '{{ db_log_rotation_size }}'
+log_line_prefix    = '{{ db_log_line_prefix }}'
+
+# Recommended minimalist settings for dev lab
+# (می‌توان در فازهای بعدی بر اساس منابع VM تنظیمات را بهینه‌تر کرد)

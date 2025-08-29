@@ -1,0 +1,11 @@
+# encoding: utf-8
+---
+- name: Reload PostgreSQL
+  service:
+    name: postgresql
+    state: reloaded
+
+- name: Restart PostgreSQL
+  service:
+    name: postgresql
+    state: restarted

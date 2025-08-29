@@ -1,0 +1,11 @@
+# encoding: utf-8
+---
+- name: Install PostgreSQL and tools (Debian)
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - postgresql-client
+      - python3-psycopg2
+    state: present
+    update_cache: yes

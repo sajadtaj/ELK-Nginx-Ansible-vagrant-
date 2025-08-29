@@ -1,0 +1,5 @@
+# encoding: utf-8
+---
+- import_tasks: install.yml
+- import_tasks: config.yml
+- import_tasks: service.yml

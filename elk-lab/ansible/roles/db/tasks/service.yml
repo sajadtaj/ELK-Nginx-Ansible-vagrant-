@@ -1,0 +1,21 @@
+# encoding: utf-8
+---
+- name: Ensure PostgreSQL is enabled and started
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: pg_isready should accept connections
+  command: pg_isready -p {{ db_port }}
+  register: pg_ready
+  changed_when: false
+  failed_when: pg_ready.rc != 0
+
+- name: Simple SELECT 1 as postgres (no-become workaround)
+  shell: sudo -u postgres psql -Atq -p {{ db_port }} -c 'SELECT 1;'
+  args:
+    warn: false
+  register: pg_select
+  changed_when: false
+  failed_when: pg_select.rc != 0 or (pg_select.stdout | trim) != "1"

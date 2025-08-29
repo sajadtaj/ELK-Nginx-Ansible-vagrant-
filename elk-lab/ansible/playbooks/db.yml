@@ -1,0 +1,9 @@
+# encoding: utf-8
+---
+- name: Configure PostgreSQL on database nodes
+  hosts: dbservers
+  become: yes
+  vars:
+    ansible_remote_tmp: /tmp
+  roles:
+    - db

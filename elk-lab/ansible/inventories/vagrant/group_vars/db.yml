@@ -1,0 +1,40 @@
+# encoding: utf-8
+# متغیرهای عمومی نقش DB (Debian 11 / PostgreSQL پیش‌فرض دیسترو)
+
+# شبکه و درگاه
+db_listen_addresses: "*"    # فقط در شبکه خصوصی Vagrant مصرف می‌شود
+db_port: 5432
+
+# کدگذاری/محلی‌سازی
+db_encoding: "UTF8"
+db_locale: "en_US.UTF-8"
+
+# Logging (سازگار با ELK)
+db_logging_collector: "on"
+db_log_destination: "csvlog"                  # پایدار و قابل پردازش
+db_log_directory: "log"                       # PGDATA/log (پیش‌فرض collector)
+db_log_filename: "postgresql-%Y-%m-%d_%H%M%S.log"
+db_log_rotation_age: "1d"
+db_log_rotation_size: "100MB"
+db_log_line_prefix: "%m [%p] %q%u@%d %r "
+
+# پارامترهای عمومی مینیمال
+db_max_connections: 100
+db_shared_buffers: "128MB"                    # مقدار محافظه‌کارانه برای VM آموزشی
+
+# دسترسی مجاز از نودهای پروژه (LB/Web/ELK)
+db_allowed_hosts:
+  - "192.168.57.10"   # lb
+  - "192.168.57.11"   # web1
+  - "192.168.57.12"   # web2
+  - "192.168.57.14"   # elk
+
+# احراز (روش)
+db_auth_method: "md5"                         # در صورت نیاز بعداً به scram ارتقا می‌دهیم
+
+# (اختیاری) ایجاد کاربر/دیتابیس نمونه — غیرفعال
+db_bootstrap: false
+db_app_user: "appuser"
+db_app_db: "appdb"
+# رمز را فقط در Vault نگه دارید؛ اینجا صرفاً برای الگو:
+db_app_password: "CHANGE_ME_IN_VAULT"

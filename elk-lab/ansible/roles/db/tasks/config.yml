@@ -1,0 +1,102 @@
+# encoding: utf-8
+---
+# 1) کشف مسیرهای کانفیگ استاندارد Debian
+- name: Discover postgresql.conf path
+  shell: "ls -1 /etc/postgresql/*/main/postgresql.conf | head -n1"
+  args: { warn: false }
+  register: pg_conf_path
+  changed_when: false
+
+- name: Discover pg_hba.conf path
+  shell: "ls -1 /etc/postgresql/*/main/pg_hba.conf | head -n1"
+  args: { warn: false }
+  register: pg_hba_path
+  changed_when: false
+
+- name: Fail if config files not found
+  fail:
+    msg: "Could not find postgresql.conf / pg_hba.conf under /etc/postgresql/*/main/"
+  when: pg_conf_path.stdout == "" or pg_hba_path.stdout == ""
+
+# --- استخراج نسخه بدون فیلتر Jinja (با sed) ---
+- name: Derive PostgreSQL major version from config path (no Jinja filters)
+  shell: |
+    conf="{{ pg_conf_path.stdout }}"
+    # مثال ورودی: /etc/postgresql/13/main/postgresql.conf  → خروجی: 13
+    echo "$conf" | sed -E 's#^/etc/postgresql/([^/]+)/main/postgresql\.conf$#\1#'
+  args: { warn: false }
+  register: pg_ver_cmd
+  changed_when: false
+  failed_when: pg_ver_cmd.rc != 0 or (pg_ver_cmd.stdout is not defined) or (pg_ver_cmd.stdout | length == 0)
+
+- name: Set PostgreSQL major version fact
+  set_fact:
+    pg_version: "{{ pg_ver_cmd.stdout }}"
+
+# --- ساخت مسیر دیتادایر استاندارد Debian بدون فیلتر Jinja ---
+- name: Build PostgreSQL data directory path (Debian standard)
+  shell: |
+    echo "/var/lib/postgresql/{{ pg_version }}/main"
+  args: { warn: false }
+  register: pg_data_cmd
+  changed_when: false
+  failed_when: pg_data_cmd.rc != 0 or (pg_data_cmd.stdout is not defined) or (pg_data_cmd.stdout | length == 0)
+
+- name: Set PostgreSQL data directory fact
+  set_fact:
+    pg_data_dir: "{{ pg_data_cmd.stdout }}"
+
+- name: Ensure data directory exists (safety)
+  file:
+    path: "{{ pg_data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: "0700"
+
+# 3) اعمال تمپلیت‌ها
+- name: Template postgresql.conf
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ pg_conf_path.stdout }}"
+    owner: postgres
+    group: postgres
+    mode: "0644"
+  notify: Restart PostgreSQL
+
+- name: Template pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ pg_hba_path.stdout }}"
+    owner: postgres
+    group: postgres
+    mode: "0640"
+  notify: Reload PostgreSQL
+
+# 4) (اختیاری) Bootstrap DB/User نمونه — پیشفرض غیرفعال
+- name: Ensure app database and user (optional)
+  become: yes
+  become_user: postgres
+  when: db_bootstrap     # بدون |bool
+  block:
+    - name: Create app database
+      postgresql_db:
+        name: "{{ db_app_db }}"
+        encoding: "{{ db_encoding }}"
+        lc_collate: "{{ db_locale }}"
+        lc_ctype: "{{ db_locale }}"
+        state: present
+
+    - name: Create app user
+      postgresql_user:
+        name: "{{ db_app_user }}"
+        password: "{{ db_app_password }}"
+        state: present
+
+    - name: Grant privileges
+      postgresql_privs:
+        db: "{{ db_app_db }}"
+        roles: "{{ db_app_user }}"
+        type: database
+        privs: "ALL"
+        state: present

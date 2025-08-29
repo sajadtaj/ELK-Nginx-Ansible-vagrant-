@@ -1,0 +1,17 @@
+# encoding: utf-8
+# pg_hba.conf — کنترل دسترسی
+# ترتیب مهم است؛ از خاص به عام.
+
+# اتصال محلی (سوکت) — برای کاربر postgres
+local   all             postgres                                peer
+
+# اتصال محلی برای بقیه کاربران/دیتابیس‌ها (در صورت نیاز):
+local   all             all                                     peer
+
+# اتصال از شبکه خصوصی Vagrant برای هاست‌های مجاز
+{% for host in db_allowed_hosts %}
+host    all             all             {{ host }}/32            {{ db_auth_method }}
+{% endfor %}
+
+# در صورت نیاز می‌توان کل subnet را مجاز کرد (غیرفعال):
+# host  all             all             192.168.57.0/24          {{ db_auth_method }}

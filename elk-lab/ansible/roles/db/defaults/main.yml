@@ -1,0 +1,26 @@
+# encoding: utf-8
+---
+db_listen_addresses: "localhost"
+db_port: 5432
+
+db_encoding: "UTF8"
+db_locale: "en_US.UTF-8"
+
+db_logging_collector: "on"
+db_log_destination: "csvlog"
+db_log_directory: "log"
+db_log_filename: "postgresql-%Y-%m-%d_%H%M%S.log"
+db_log_rotation_age: "1d"
+db_log_rotation_size: "100MB"
+db_log_line_prefix: "%m [%p] %q%u@%d %r "
+
+db_max_connections: 100
+db_shared_buffers: "128MB"
+
+db_allowed_hosts: []
+db_auth_method: "md5"
+
+db_bootstrap: false
+db_app_user: "appuser"
+db_app_db: "appdb"
+db_app_password: "CHANGE_ME_IN_VAULT"
