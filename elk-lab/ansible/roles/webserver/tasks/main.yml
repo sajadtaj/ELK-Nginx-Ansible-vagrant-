@@ -1,0 +1,54 @@
+# encoding: utf-8
+---
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Ensure web root exists
+  file:
+    path: "{{ webserver_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Deploy index.html
+  template:
+    src: index.html.j2
+    dest: "{{ webserver_root }}/index.html"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Deploy nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Deploy site config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/conf.d/site.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Validate nginx configuration
+  command: nginx -t
+  register: nginx_check
+  changed_when: false
+  failed_when: nginx_check.rc != 0
+
+- name: Ensure nginx is enabled and running
+  service:
+    name: nginx
+    state: started
+    enabled: yes

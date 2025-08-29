@@ -1,0 +1,15 @@
+# تنظیمات وب‌سرورها (web1, web2)
+webserver_port: 8080
+webserver_root: /var/www/app
+webserver_server_name: "_"
+
+# لاگ JSON سازگار با ELK
+webserver_log_format: |
+  log_format json_combined escape=json
+    '{ "time":"$time_iso8601",'
+    ' "remote_addr":"$remote_addr",'
+    ' "method":"$request_method",'
+    ' "uri":"$uri",'
+    ' "status":$status,'
+    ' "bytes_sent":$bytes_sent,'
+    ' "request_time":$request_time }';

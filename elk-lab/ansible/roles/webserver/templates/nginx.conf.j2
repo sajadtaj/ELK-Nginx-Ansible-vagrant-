@@ -1,0 +1,22 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    {{ webserver_log_format }}
+
+    access_log /var/log/nginx/access.log json_combined;
+    error_log  /var/log/nginx/error.log warn;
+
+    sendfile on;
+    keepalive_timeout 65;
+
+    include /etc/nginx/conf.d/*.conf;
+}

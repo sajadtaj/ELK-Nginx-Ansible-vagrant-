@@ -1,0 +1,4 @@
+# مقادیر پیش‌فرض
+webserver_port: 8080
+webserver_root: /var/www/app
+webserver_server_name: "_"

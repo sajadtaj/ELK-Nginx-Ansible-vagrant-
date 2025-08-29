@@ -1,0 +1,7 @@
+# encoding: utf-8
+---
+- name: Configure Web Servers
+  hosts: webservers
+  become: yes
+  roles:
+    - webserver
